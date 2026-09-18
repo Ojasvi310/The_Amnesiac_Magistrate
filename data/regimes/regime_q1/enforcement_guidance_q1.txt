@@ -1,0 +1,25 @@
+Regulation A — Enforcement Guidance Bulletin Q1-2024-EG-001 (Effective Q1 2024)
+
+This bulletin provides authoritative interpretation of Section 4.1 breach notification timelines.
+
+Q: Does the 72-hour clock begin at the moment of initial suspicion or confirmed discovery?
+A: The 72-hour period begins when the data controller has sufficient information to conclude
+   that a personal data breach has occurred. Preliminary investigation to confirm suspicion
+   does not pause the clock if the investigation itself takes more than 24 hours.
+
+Q: Are third-party processors' discovery events attributable to the data controller?
+A: Yes. If a data processor discovers a breach affecting the data controller's personal data,
+   the 72-hour clock begins when the processor notifies the controller, provided that processor
+   notification occurs within 12 hours of the processor's own discovery.
+
+Q: What constitutes "high risk" for purposes of individual notification under Section 4.3?
+A: High risk is presumed where the compromised data includes financial account credentials,
+   medical information, or government-issued identification numbers. Controllers may rebut
+   this presumption by demonstrating that the data was rendered unintelligible (e.g., encrypted)
+   prior to or at the time of the breach and the encryption key was not compromised.
+
+Penalty Safe Harbor:
+A data controller that has implemented a documented incident response plan reviewed within
+the prior 12 months and makes a good-faith notification effort within 72 hours, even if
+incomplete, will not be subject to the enhanced "repeated violation" surcharge under Section 5.3
+for a first occurrence of late filing.

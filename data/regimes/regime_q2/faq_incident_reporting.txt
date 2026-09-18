@@ -1,0 +1,28 @@
+Regulation B — Frequently Asked Questions: AI Incident Reporting (Effective Q2 2024)
+
+Q1: Does Section 4.1's 48-hour clock apply to incidents discovered by a third-party vendor
+    running the AI system on a deployer's behalf?
+A1: Yes. The deployer bears primary reporting responsibility. Vendor contracts must include
+    a clause requiring the vendor to notify the deployer within 12 hours of discovering a
+    material-harm incident. The 48-hour clock for the deployer's regulatory report begins
+    upon deployer notification by the vendor.
+
+Q2: Our AI system flagged a loan applicant incorrectly. The error was caught internally and
+    corrected before any formal decision was issued. Is this a reportable incident?
+A2: No, provided the correction occurred before the output was used to make or substantially
+    influence a final decision affecting the individual. Internal quality-control catches that
+    are remediated prior to output issuance are not reportable under Section 4.1. Deployers
+    should nonetheless log such events internally for Conformity Assessment update purposes.
+
+Q3: What constitutes a "material change" triggering a Conformity Assessment update under 2.2?
+A3: Material changes include: retraining on substantially different data (>30% new data by
+    volume), a change in the model architecture or inference pipeline, expansion to a new
+    decision domain not covered in the original assessment, or any change that alters accuracy
+    or demographic parity metrics by more than 5 percentage points on the original test set.
+
+Q4: Can a Conformity Assessment prepared under Regulation A's data governance requirements
+    satisfy Regulation B's Section 2.1 requirements?
+A4: Only partially. A Regulation A-compliant data governance section may be incorporated by
+    reference, but Regulation B additionally requires bias disaggregation metrics and a
+    foreseeable-misuse analysis that Regulation A does not mandate. A combined assessment
+    document covering both regulations is permissible and encouraged.

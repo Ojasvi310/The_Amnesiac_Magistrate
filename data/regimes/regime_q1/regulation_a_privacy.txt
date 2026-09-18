@@ -1,0 +1,37 @@
+Regulation A — Data Privacy and Retention Act (Effective Q1 2024)
+
+Section 1. Definitions.
+For the purposes of this Act, "personal data" means any information relating to an identified or
+identifiable natural person. "Data controller" means any entity that determines the purposes and
+means of processing personal data. "Retention period" means the duration for which personal data
+may lawfully be stored.
+
+Section 2. Data Retention Requirements.
+2.1 Data controllers must not retain personal data beyond the stated retention period unless
+    expressly authorized by a subsequent regulatory order.
+2.2 Default retention periods by category:
+    (a) Financial transaction records: 7 years from the date of transaction.
+    (b) Employee records: 5 years from end of employment.
+    (c) Customer contact information: 3 years from last interaction, unless consent renewed.
+    (d) Medical records processed for billing: 10 years from date of service.
+2.3 Data controllers must maintain a retention schedule, updated annually, listing each data
+    category, its retention period, and the legal basis for retention.
+
+Section 3. Consent Requirements.
+3.1 Processing personal data for marketing purposes requires explicit, affirmative consent.
+3.2 Consent may not be bundled with acceptance of general terms and conditions.
+3.3 Data subjects may withdraw consent at any time; withdrawal takes effect within 30 days.
+
+Section 4. Breach Notification.
+4.1 Upon discovery of a data breach affecting more than 500 individuals, the data controller
+    must notify the Regulatory Authority within 72 hours.
+4.2 Notification must include: scope of breach, categories of data affected, likely consequences,
+    and remediation measures taken or planned.
+4.3 Individual notification is required where the breach is likely to result in high risk to
+    the individuals concerned, to be sent without undue delay.
+
+Section 5. Penalties.
+5.1 Failure to notify within 72 hours: fine of up to 2% of annual global turnover or $10 million,
+    whichever is greater.
+5.2 Unlawful retention beyond the prescribed period: fine up to 1% of annual global turnover.
+5.3 Repeated violations within 36 months are subject to enhanced penalties at double the base rate.

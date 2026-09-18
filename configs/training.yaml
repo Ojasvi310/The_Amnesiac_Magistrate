@@ -1,0 +1,82 @@
+# Training hyperparameters for Continual Counsel.
+# Every value here is a config field — nothing is a literal buried in code.
+# Sweep ranges from the spec §4 are listed in comments next to each value.
+
+# ── LoRA ──────────────────────────────────────────────────────────────────────
+lora:
+  rank: 16                    # sweep: 8 / 16 / 32 (must not exceed base.yaml profile.lora_rank_ceiling)
+  alpha: 32                   # kept fixed; alpha/rank ratio = 2 is a stable default
+  dropout: 0.05
+  target_modules:             # ablation: drop to attention-only by removing gate/up/down_proj
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+  bias: "none"
+  task_type: "CAUSAL_LM"
+
+# ── O-LoRA orthogonality ──────────────────────────────────────────────────────
+orthogonality:
+  lambda_weight: 0.1          # sweep: 0 / 0.01 / 0.1 / 1.0
+  lambda_bump_factor: 2.0     # multiplied into lambda when Step D rejects; caps at lambda * 8
+  lambda_max: 0.8             # hard ceiling on bumped lambda
+
+# ── Training loop ─────────────────────────────────────────────────────────────
+training:
+  num_epochs: 3
+  learning_rate: 2.0e-4
+  warmup_ratio: 0.03
+  lr_scheduler: "cosine"
+  weight_decay: 0.01
+  # batch_size is intentionally not config-driven yet — hardcoded to 4 in train_adapter.py
+  # TODO: make per-GPU dynamic once VRAM detection is wired (currently hardcoded at 4)
+  gradient_accumulation_steps: 4
+  max_seq_length: 1024
+  fp16: true                  # set false if Colab assigns a GPU that prefers bf16 (A100/L4)
+  bf16: false                 # train_adapter.py detects GPU and overrides if bf16 is supported
+
+# ── Replay ────────────────────────────────────────────────────────────────────
+replay:
+  ratio: 0.30                 # sweep: 0.10 – 0.40; fraction of each training batch from replay
+  golden_set_min: 500
+  golden_set_max: 2000
+  refresh_enabled: false      # when true, triggers refresh-and-drift-diff after every TIES merge
+
+# ── Continual learning gates ──────────────────────────────────────────────────
+gates:
+  bwt_degradation_threshold: 0.03  # 3% absolute; failure triggers lambda bump + retrain
+
+# ── TIES merge ────────────────────────────────────────────────────────────────
+merge:
+  cadence: 2                  # every N quarters; sweep: 1 / 2 / 3; "never" disables TIES
+  ties_keep_top_pct: 0.20     # keep top 20% by magnitude; trim the bottom 80%
+  post_merge_bwt_tolerance: 0.02  # merged adapter must not regress more than 2% vs unmerged stack
+
+# ── Distillation (feature-level, config-gated) ───────────────────────────────
+distillation:
+  enabled: false
+  loss_weight: 0.5            # weight of distillation term in total loss L
+
+# ── DPO (config-gated, option a: re-run Step D gate post-DPO) ────────────────
+dpo:
+  enabled: false
+  revalidation_mode: "gate"   # "gate" = option (a); "orthogonal" = option (b) [not implemented]
+  num_epochs: 1
+  beta: 0.1
+
+# ── Quantization ─────────────────────────────────────────────────────────────
+quantization:
+  level: "Q4_K_M"             # ablation: Q5_K_M / Q8_0; must match base.yaml profile default
+
+# ── Export ────────────────────────────────────────────────────────────────────
+export:
+  cadence: "every_adapter"    # "every_adapter" | "merge_only"
+                              # every_adapter allows per-quarter local testing
+
+# ── Evaluation ────────────────────────────────────────────────────────────────
+eval:
+  held_out_fraction: 0.15     # fraction of each regime's docs reserved for benchmark
+  confusion_set_size: 100     # number of cross-regime adversarial pairs

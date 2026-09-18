@@ -1,0 +1,45 @@
+# Base configuration for Continual Counsel.
+# Model profile is selected at runtime: --profile proxy (default) or --profile full_scale.
+# All hyperparameters that differ between profiles are listed explicitly under each profile.
+
+active_profile: proxy
+
+profiles:
+  proxy:
+    # Qwen2.5-1.5B-Instruct is small enough to fine-tune on a Colab T4 in reasonable time.
+    # Its instruction-tuned chat template is compatible with the QA prompt format used in
+    # replay_gen.py and train_adapter.py without modification.
+    model_id: "Qwen/Qwen2.5-1.5B-Instruct"
+    lora_rank_ceiling: 32       # absolute max rank allowed; training.yaml must not exceed this
+    vram_budget_gb: null        # null = detect at runtime, don't assume T4/A100/L4
+    gguf_quant_level: "Q4_K_M" # overridable via training.yaml; kept here as profile default
+
+  full_scale:
+    # Not used by default. Exists to document exactly what changes when scaling up.
+    # Primary: meta-llama/Llama-3.1-8B-Instruct (requires HF token + gated model access).
+    # Fallback: mistralai/Mistral-7B-Instruct-v0.3 (same rank/quant settings, open access).
+    model_id: "meta-llama/Llama-3.1-8B-Instruct"
+    model_id_fallback: "mistralai/Mistral-7B-Instruct-v0.3"
+    lora_rank_ceiling: 64       # larger model can absorb higher rank without over-fitting
+    vram_budget_gb: 40          # A100 40GB baseline; L4 has 24GB so rank may need capping
+    gguf_quant_level: "Q5_K_M"  # one quant step up from proxy; Q8_0 for precision ablation
+
+# ── Paths (relative to repo root; resolved to absolute by config loader) ──────
+paths:
+  data_regimes: "data/regimes"
+  replay_cache: "data/replay_cache"
+  exports: "exports"
+  runs: "runs"
+  db: "continual_counsel.db"   # SQLite file; single file for both registry and audit log
+  llama_cpp_dir: "llama.cpp"   # expected location after `git clone` inside Colab session
+
+# ── Embedding model (used by retrieval.py locally AND replay grounding on Colab) ─
+retrieval:
+  embed_model_id: "BAAI/bge-small-en-v1.5"
+  top_k: 5
+  confidence_threshold: 0.45   # cosine similarity; below this → InsufficientGrounding
+
+# ── Python version pinning ────────────────────────────────────────────────────
+# Actual version resolved at Colab setup time is logged by pipeline.py on startup.
+# This field exists so the export bundle manifest can record what Python ran the training.
+python_version_expected: "3.11"

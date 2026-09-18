@@ -1,0 +1,40 @@
+Regulation B — AI Systems Accountability and Transparency Act (Effective Q2 2024)
+
+Section 1. Definitions.
+"High-risk AI system" means any automated decision-making system that produces outputs used to
+make or substantially influence decisions affecting individuals in domains including: credit and
+insurance underwriting, employment screening, clinical diagnosis support, and law enforcement
+risk scoring. "Deployer" means any entity that places a high-risk AI system into service or
+operates it in the course of commercial activity.
+
+Section 2. Pre-Deployment Assessment.
+2.1 Deployers must complete a Conformity Assessment before placing a high-risk AI system into
+    service, covering: intended purpose, foreseeable misuse scenarios, accuracy and bias metrics
+    disaggregated by protected characteristics, and data governance documentation.
+2.2 Conformity Assessments must be updated following any material change to the system's model,
+    training data, or operational parameters.
+2.3 Assessments must be retained for a minimum of 10 years and made available to the Regulatory
+    Authority upon request within 14 business days.
+
+Section 3. Transparency Requirements.
+3.1 Individuals subject to decisions made with substantial AI assistance must be informed that
+    AI was used, and must be offered a meaningful right to request human review.
+3.2 The right to human review must be exercised within 30 days of notification. Deployers must
+    respond to human review requests within 21 business days.
+3.3 Explanations provided under Section 3.1 must be in plain language accessible to a layperson
+    and must not reference proprietary model weights or architecture as a reason for opacity.
+
+Section 4. Incident Reporting.
+4.1 Deployers must report to the Regulatory Authority any AI-related incident that results in
+    material harm to an individual within 48 hours of discovery.
+4.2 "Material harm" includes wrongful denial of credit, insurance, or employment due to AI error,
+    or any clinical decision support output that contributed to a demonstrably incorrect diagnosis.
+4.3 Deployers must maintain a publicly accessible incident register updated quarterly.
+
+Section 5. Penalties.
+5.1 Failure to complete a Conformity Assessment before deployment: fine up to 3% of annual
+    global turnover or $15 million, whichever is greater.
+5.2 Failure to honor a valid human review request: fine up to 1.5% of annual turnover per
+    unresolved request, capped at $5 million per enforcement action.
+5.3 Knowingly deploying a system whose Conformity Assessment revealed unmitigated high-severity
+    bias: fine up to 5% of annual global turnover; criminal referral possible for senior officers.

@@ -1,0 +1,31 @@
+# Colab/GPU dependencies only.
+# DO NOT install these on the local inference machine — bitsandbytes requires a
+# GPU-visible torch build and will break pip resolution on CPU-only hardware.
+#
+# Install inside Colab session with:
+#   pip install -r requirements-offline.txt
+#
+# llama.cpp conversion scripts are cloned separately (see pipeline.py and export.py);
+# they are NOT a pip package — they're invoked as subprocess calls to convert.py.
+
+# Core training stack
+torch>=2.2.0
+transformers>=4.40.0
+accelerate>=0.29.0
+peft>=0.10.0
+bitsandbytes>=0.43.0          # 4-bit/8-bit training-time quantization; GPU only
+datasets>=2.18.0
+trl>=0.8.6                    # for DPO trainer (dpo_polish.py)
+
+# Embedding + retrieval (needed on Colab for Step A's grounding filter,
+# which reads the FAISS index snapshot shipped up in the input bundle)
+sentence-transformers>=2.7.0
+faiss-cpu>=1.8.0              # cpu build works fine here; we only query, not build, on Colab
+
+# Config + utilities
+pyyaml>=6.0.1
+numpy>=1.26.0
+scipy>=1.13.0                 # used by TIES-merge tensor ops
+
+# Experiment logging
+pandas>=2.2.0
