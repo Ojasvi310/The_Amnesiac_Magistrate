@@ -421,7 +421,6 @@ def train_lora(
         gradient_accumulation_steps=loop_cfg.gradient_accumulation_steps,
         learning_rate=loop_cfg.learning_rate,
         lr_scheduler_type=loop_cfg.lr_scheduler,
-        warmup_ratio=loop_cfg.warmup_ratio,
         weight_decay=loop_cfg.weight_decay,
         fp16=use_fp16,
         bf16=use_bf16,
