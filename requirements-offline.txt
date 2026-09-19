@@ -16,6 +16,7 @@ peft>=0.10.0
 bitsandbytes>=0.43.0          # 4-bit/8-bit training-time quantization; GPU only
 datasets>=2.18.0
 trl>=0.8.6                    # for DPO trainer (dpo_polish.py)
+torchao>=0.16.0               # required by peft>=0.10 for quantized model dispatch
 
 # Embedding + retrieval (needed on Colab for Step A's grounding filter,
 # which reads the FAISS index snapshot shipped up in the input bundle)
