@@ -223,8 +223,12 @@ def run_regime_update(
     basis_checkpoint_path = paths["runs"] / "basis_checkpoint.pt"
     if basis_checkpoint_path.exists():
         try:
-            saved_Q = torch.load(str(basis_checkpoint_path), map_location="cpu")
-            basis._Q = saved_Q
+            saved_Qs = torch.load(str(basis_checkpoint_path), map_location="cpu", weights_only=False)
+            if isinstance(saved_Qs, dict):
+                basis._Qs = saved_Qs
+            else:
+                # Migrate old single-tensor format (d=saved_Qs.shape[0])
+                basis._Qs = {saved_Qs.shape[0]: saved_Qs}
             log.info("Loaded basis checkpoint from %s (rank=%d).", basis_checkpoint_path, basis.rank)
         except Exception as exc:
             log.warning("Failed to load basis checkpoint: %s. Starting fresh.", exc)
@@ -322,8 +326,8 @@ def run_regime_update(
         return summary
 
     # Persist updated basis.
-    if basis._Q is not None:
-        torch.save(basis._Q, str(basis_checkpoint_path))
+    if basis._Qs:
+        torch.save(basis._Qs, str(basis_checkpoint_path))
         log.info("Basis checkpoint saved to %s.", basis_checkpoint_path)
 
     # -------------------------------------------------------------------------

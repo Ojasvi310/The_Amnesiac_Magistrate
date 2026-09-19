@@ -39,81 +39,62 @@ class OrthonormalBasis:
     Each adapter in the O-LoRA sequence contributes a set of A-matrices (the
     low-rank down-projection). We accumulate an orthonormal basis from their
     columns so that new adapters can be penalised for projecting into the same
-    subspace as prior ones (catastrophic forgetting via weight interference).
+    subspace as prior ones.
 
-    The basis is stored as a single matrix Q (cols = basis vectors).
+    The basis is stored as a dictionary mapping layer input dimension to a matrix Q.
     """
 
     def __init__(self) -> None:
-        # Q: float32 CPU tensor, shape (feature_dim, n_basis_vectors).
-        # None until the first update.
-        self._Q: torch.Tensor | None = None
+        self._Qs: dict[int, torch.Tensor] = {}
 
     @property
     def rank(self) -> int:
-        """Number of basis vectors accumulated so far."""
-        return 0 if self._Q is None else self._Q.shape[1]
+        """Number of basis vectors accumulated so far (sum across all dims)."""
+        return sum(Q.shape[1] for Q in self._Qs.values())
 
     def update(self, new_A_matrices: list[torch.Tensor]) -> None:
-        """Incorporate a new adapter's A-matrices into the cumulative basis.
-
-        Each A-matrix has shape (lora_rank, feature_dim). We flatten along the
-        rank axis, run QR, and extend Q by the new orthogonal directions.
-
-        Silently skips matrices that are fully in the existing span (no new
-        directions to add).
-        """
+        """Incorporate a new adapter's A-matrices into the cumulative basis."""
         for A in new_A_matrices:
-            # A: (r, d) -- rows are the LoRA rank directions.
+            d = A.shape[1]
             cols = A.detach().float().cpu().T  # (d, r)
-            if self._Q is None:
+            if d not in self._Qs:
                 Q, _ = torch.linalg.qr(cols)
-                self._Q = Q
+                self._Qs[d] = Q
             else:
-                # Project out the existing span before adding.
-                proj = self._Q @ (self._Q.T @ cols)
+                Q_exist = self._Qs[d]
+                proj = Q_exist @ (Q_exist.T @ cols)
                 residual = cols - proj
                 if residual.norm() < 1e-6:
-                    # Fully within existing span; nothing new to add.
                     continue
                 Q_new, _ = torch.linalg.qr(residual)
-                # Filter out near-zero columns produced by QR on a rank-deficient residual.
                 norms = Q_new.norm(dim=0)
                 Q_new = Q_new[:, norms > 1e-6]
                 if Q_new.shape[1] > 0:
-                    self._Q = torch.cat([self._Q, Q_new], dim=1)
+                    self._Qs[d] = torch.cat([Q_exist, Q_new], dim=1)
 
     def orthogonality_loss(self, new_A_matrices: list[torch.Tensor]) -> torch.Tensor:
-        """Penalise the current adapter's A-matrices for overlap with the accumulated basis.
-
-        Loss = mean over all A-matrices of ||Q^T A^T||_F^2, which measures how much
-        each new direction projects onto the existing subspace. Zero means fully
-        orthogonal (ideal); high values mean significant overlap (forgetting risk).
-        """
-        if self._Q is None or len(new_A_matrices) == 0:
-            # No prior regimes -- nothing to be orthogonal to.
+        """Penalise the current adapter's A-matrices for overlap with the accumulated basis."""
+        if not self._Qs or len(new_A_matrices) == 0:
             device = new_A_matrices[0].device if new_A_matrices else torch.device("cpu")
             return torch.tensor(0.0, device=device, requires_grad=False)
 
         device = new_A_matrices[0].device
-        Q = self._Q.to(device)
         losses = []
         for A in new_A_matrices:
-            # A: (r, d). Q: (d, k).
-            # We want ||Q^T @ A^T||_F^2 = how much of A's column space overlaps Q.
+            d = A.shape[1]
+            if d not in self._Qs:
+                continue
+            Q = self._Qs[d].to(device)
             proj = Q.T @ A.T  # (k, r)
             losses.append((proj ** 2).sum())
 
+        if not losses:
+            return torch.tensor(0.0, device=device, requires_grad=False)
         return torch.stack(losses).mean()
 
     def reset_from_merged(self, merged_A_matrices: list[torch.Tensor]) -> None:
-        """Rebuild the basis from a TIES-merged adapter's A-matrices.
-
-        Called after a TIES merge event (Step E) so that the basis reflects the
-        merged parameter state rather than the cumulative sum of all per-regime
-        bases (which would grow monotonically and saturate available rank).
-        """
-        self._Q = None
+        """Rebuild the basis from a TIES-merged adapter's A-matrices."""
+        self._Qs.clear()
         self.update(merged_A_matrices)
         log.info("OrthonormalBasis reset from merged adapter; new rank = %d", self.rank)
 
