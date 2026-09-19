@@ -236,11 +236,11 @@ def assemble_bundle(
         log.warning("Adapter directory not found: %s", adapter_src)
 
     # Copy GGUF.
-    gguf_src = Path(gguf_path)
-    if gguf_src.exists():
+    gguf_src = Path(gguf_path) if gguf_path else None
+    if gguf_src and gguf_src.is_file():
         shutil.copy2(str(gguf_src), str(bundle_dir / "model.gguf"))
     else:
-        log.warning("GGUF file not found: %s. Bundle will be incomplete.", gguf_src)
+        log.warning("GGUF file not found or not produced: %s. Bundle will be incomplete.", gguf_path)
 
     # Copy basis checkpoint.
     basis_src = Path(basis_checkpoint)
