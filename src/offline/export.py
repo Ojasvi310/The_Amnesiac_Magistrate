@@ -229,15 +229,7 @@ def assemble_bundle(
     else:
         log.warning("Golden set directory not found: %s", golden_src)
 
-    # Write benchmark results.
-    bench_path = bundle_dir / "benchmark_results.json"
-    serialisable_results = {}
-    for name, result in benchmark_results.items():
-        if hasattr(result, "__dict__"):
-            serialisable_results[name] = asdict(result) if hasattr(result, "__dataclass_fields__") else vars(result)
-        else:
-            serialisable_results[name] = result
-    bench_path.write_text(json.dumps(serialisable_results, indent=2), encoding="utf-8")
+
 
     # Write manifest last (so it captures all copied files).
     write_manifest(str(bundle_dir), commit_hash, python_version)

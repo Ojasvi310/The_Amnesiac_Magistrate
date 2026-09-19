@@ -435,7 +435,6 @@ def train_lora(
     log.info("Basis updated after training; new rank = %d", basis.rank)
 
     model.save_pretrained(str(adapter_dir))
-    tokenizer.save_pretrained(str(adapter_dir))
     log.info("Adapter saved to %s", adapter_dir)
 
     return adapter_dir

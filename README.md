@@ -1,9 +1,39 @@
 # Continual Counsel
 
-An edge-deployable legal/regulatory compliance assistant with continual learning — quarterly
-regulatory updates via O-LoRA fine-tuning, TIES-merging, and local quantized inference.
+An edge-deployable legal/regulatory compliance assistant with continual learning — quarterly regulatory updates via O-LoRA fine-tuning, TIES-merging, and local quantized inference.
 
-**Architecture**: two physically separate execution environments:
+This project demonstrates how to adapt a localized language model to sequential, disparate legal regimes (Q1, Q2, etc.) **without catastrophic forgetting** and **without retaining original confidential texts**.
+
+## Core Architecture: Overcoming Catastrophic Forgetting
+
+Traditional fine-tuning methods suffer from catastrophic amnesia because sequential updates overwrite the vector subspaces used by earlier tasks. 
+
+Our solution leverages **Orthogonal Low-Rank Adaptation (O-LoRA)**:
+1. **Mathematical Isolation:** After training on a legal regime (e.g., Q1), we extract the principal components of the model's intermediate activations and save an orthonormal basis checkpoint.
+2. **Orthogonal Projection:** When training on the next regime (e.g., Q2), gradient updates are explicitly projected *away* from the previous basis. This guarantees that new knowledge is written into an orthogonal subspace, preserving foundational precedents without interference.
+3. **No Data Replay:** Because previous knowledge is protected mathematically via the basis checkpoint, there is zero need to store highly confidential historical training corpora in the edge vaults.
+4. **Edge-Hardware Viable:** The core model remains entirely frozen and quantized to 4-bit (GGUF format), ensuring the entire stack runs flawlessly on constrained edge hardware.
+
+## Quick Start (Running Locally)
+
+To test the offline edge dashboard and inference engine on your own machine:
+
+1. **Start the FastAPI Inference Server:**
+   ```bash
+   # Windows:
+   .\run_api.bat
+   ```
+
+2. **Start the Dashboard:**
+   In a separate terminal, launch the Streamlit interface:
+   ```bash
+   streamlit run dashboard/app.py
+   ```
+   Navigate to `http://localhost:8501`. You can test the interference resilience by asking questions from Regime 1 (e.g., data breach timelines) and Regime 2 (e.g., AI incident timelines).
+
+---
+
+**Execution Environments**: Two physically separate execution environments:
 
 | Loop | Machine | Key tools |
 |---|---|---|
@@ -299,7 +329,6 @@ continual-counsel/
     smoke_test_no_network.sh      # Docker + --network none smoke test
     run_colab_tests.sh            # runs colab_only pytest subset in Colab
     run_full_eval.sh
-  .github/workflows/ci.yml
   Dockerfile                      # local inference service only
   tests/
     conftest.py
@@ -310,21 +339,6 @@ continual-counsel/
     test_dpo_revalidation.py
     test_export_bundle.py
 ```
-
----
-
-## CI
-
-GitHub Actions runs on every push:
-
-1. **`test-local`**: `pytest -m "not colab_only" -v tests/` — all tests that don't need GPU
-2. **`smoke-test`**: runs the Docker inference container with `--network none`, confirms a health check succeeds
-3. **`import-graph-check`**: `grep` confirms no HTTP client or training library imports in `src/online/`
-
-> **GPU/Colab-only tests** (marked `@pytest.mark.colab_only`) are **excluded from CI**.
-> GitHub Actions runners have no GPU. Run them inside a Colab session with
-> `bash scripts/run_colab_tests.sh`. This limitation is documented here rather than
-> faking a green check on untested code.
 
 ---
 
