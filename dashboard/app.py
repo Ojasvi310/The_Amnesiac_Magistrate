@@ -47,8 +47,20 @@ if not adapters:
 
 # Sidebar
 st.sidebar.header("Filters")
-adapter_options = [a.adapter_version_hash for a in adapters]
-selected_adapter = st.sidebar.selectbox("Select Adapter Version", ["All"] + adapter_options)
+
+adapter_mapping = {"All": "All"}
+for a in adapters:
+    # Format "regime_q1" -> "Regime Q1"
+    clean_name = a.regime.replace("regime_", "Regime ").replace("q", "Q")
+    short_hash = a.adapter_version_hash.replace("sha256:", "")[:8]
+    adapter_mapping[a.adapter_version_hash] = f"{clean_name} ({short_hash})"
+
+adapter_options = ["All"] + [a.adapter_version_hash for a in adapters]
+selected_adapter = st.sidebar.selectbox(
+    "Select Adapter Version", 
+    options=adapter_options,
+    format_func=lambda x: adapter_mapping.get(x, x)
+)
 
 # Tabs
 tab_chat, tab_metrics, tab_queries, tab_lineage, tab_confusion = st.tabs([
