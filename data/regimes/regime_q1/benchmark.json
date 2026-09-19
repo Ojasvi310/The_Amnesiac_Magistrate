@@ -1,0 +1,34 @@
+[
+  {
+    "prompt": "Under Regulation A, how many hours does a data controller have to report a personal data breach to the supervisory authority?",
+    "expected_keywords": ["72", "hours", "72 hours"]
+  },
+  {
+    "prompt": "What triggers the 72-hour breach notification clock under Regulation A?",
+    "expected_keywords": ["discovery", "becomes aware", "discovered"]
+  },
+  {
+    "prompt": "Under Regulation A Section 4, what must be included in a breach notification to the supervisory authority?",
+    "expected_keywords": ["nature", "categories", "approximate number", "contact details"]
+  },
+  {
+    "prompt": "What is the maximum fine for a first-time data breach notification failure under Regulation A?",
+    "expected_keywords": ["2%", "10 million", "global turnover"]
+  },
+  {
+    "prompt": "Under Regulation A, when must affected individuals be notified after a high-risk data breach?",
+    "expected_keywords": ["72 hours", "without undue delay", "high risk"]
+  },
+  {
+    "prompt": "What does the term 'Data Controller' mean under Regulation A?",
+    "expected_keywords": ["determines", "purposes", "means", "processing"]
+  },
+  {
+    "prompt": "Under Regulation A Section 5, what is the penalty for repeat violations involving sensitive personal data?",
+    "expected_keywords": ["4%", "20 million", "annual global turnover"]
+  },
+  {
+    "prompt": "Under Regulation A, how long must data breach records be retained by the data controller?",
+    "expected_keywords": ["5 years", "five years", "retained"]
+  }
+]

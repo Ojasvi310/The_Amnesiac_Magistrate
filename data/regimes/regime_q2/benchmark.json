@@ -1,0 +1,34 @@
+[
+  {
+    "prompt": "Under Regulation B, how many hours does a deployer have to report a material-harm AI incident to the Regulatory Authority?",
+    "expected_keywords": ["48", "hours", "48 hours"]
+  },
+  {
+    "prompt": "What is a 'High-risk AI system' under Regulation B?",
+    "expected_keywords": ["automated decision", "credit", "employment", "clinical", "law enforcement"]
+  },
+  {
+    "prompt": "Under Regulation B Section 2, what must a deployer complete before placing a high-risk AI system into service?",
+    "expected_keywords": ["conformity assessment", "conformity"]
+  },
+  {
+    "prompt": "How long must Conformity Assessments be retained under Regulation B Section 2.3?",
+    "expected_keywords": ["10 years", "ten years"]
+  },
+  {
+    "prompt": "Under Regulation B Section 3, within how many days must an individual exercise their right to human review?",
+    "expected_keywords": ["30 days", "30", "thirty"]
+  },
+  {
+    "prompt": "Under Regulation B Section 3.2, within how many business days must a deployer respond to a human review request?",
+    "expected_keywords": ["21", "21 business days", "twenty-one"]
+  },
+  {
+    "prompt": "What is the maximum fine under Regulation B Section 5.1 for failure to complete a Conformity Assessment?",
+    "expected_keywords": ["3%", "15 million", "global turnover"]
+  },
+  {
+    "prompt": "Under Regulation B Section 5.3, what is the penalty for knowingly deploying a system with unmitigated high-severity bias?",
+    "expected_keywords": ["5%", "annual global turnover", "criminal"]
+  }
+]
