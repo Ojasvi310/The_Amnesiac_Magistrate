@@ -1,0 +1,34 @@
+[
+  {
+    "prompt": "Under Regulation C, what is the reporting deadline for offshore asset acquisitions?",
+    "expected_keywords": ["90", "days", "90 days"]
+  },
+  {
+    "prompt": "What automatic penalty is triggered if the 90-day offshore asset reporting deadline is missed under Regulation C?",
+    "expected_keywords": ["15%", "punitive", "tariff", "total asset value"]
+  },
+  {
+    "prompt": "Under Regulation C Section 2, which authority must receive offshore asset acquisition disclosures?",
+    "expected_keywords": ["international revenue authority", "revenue authority"]
+  },
+  {
+    "prompt": "What does the term 'Offshore Asset' mean under Regulation C?",
+    "expected_keywords": ["capital", "outside", "sovereign wealth fund"]
+  },
+  {
+    "prompt": "What is the Antitrust Threshold defined in Regulation C?",
+    "expected_keywords": ["35%", "market share", "critical infrastructure"]
+  },
+  {
+    "prompt": "Under Regulation C, what must a multinational bank submit before finalising a merger that crosses the Antitrust Threshold?",
+    "expected_keywords": ["market competition waiver", "waiver"]
+  },
+  {
+    "prompt": "When does the 90-day reporting clock start under Regulation C Section 2.2?",
+    "expected_keywords": ["final signature", "date of final signature"]
+  },
+  {
+    "prompt": "Which entities must disclose offshore asset acquisitions under Regulation C?",
+    "expected_keywords": ["sovereign wealth fund", "funds"]
+  }
+]

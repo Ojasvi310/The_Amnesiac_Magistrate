@@ -1,0 +1,34 @@
+[
+  {
+    "prompt": "Under Regulation D, what is the reporting deadline for restricted tech export tariffs?",
+    "expected_keywords": ["24", "hours", "24 hours"]
+  },
+  {
+    "prompt": "What is the Tier 1 Tariff Rate for Cross-Border Transfers of Restricted Technology under Regulation D?",
+    "expected_keywords": ["22.5%", "22.5", "tier 1"]
+  },
+  {
+    "prompt": "What happens if the 24-hour reporting deadline for restricted tech tariffs is missed under Regulation D?",
+    "expected_keywords": ["revocation", "export license", "immediate"]
+  },
+  {
+    "prompt": "What does 'Restricted Technology' mean under Regulation D?",
+    "expected_keywords": ["semiconductors", "cryptographic", "quantum"]
+  },
+  {
+    "prompt": "Under Regulation D Section 3, who holds secondary liability if the primary exporter defaults on the Tier 1 Tariff?",
+    "expected_keywords": ["multinational banks", "banks", "secondary liability"]
+  },
+  {
+    "prompt": "When does the 24-hour reporting clock start under Regulation D Section 2.2?",
+    "expected_keywords": ["clear customs", "customs", "moment"]
+  },
+  {
+    "prompt": "What is a Cross-Border Transfer under Regulation D?",
+    "expected_keywords": ["physical", "digital", "goods", "sovereign lines"]
+  },
+  {
+    "prompt": "Under Regulation D, which tariff rate applies immediately to any Cross-Border Transfer of Restricted Technology?",
+    "expected_keywords": ["22.5%", "tier 1", "immediate"]
+  }
+]
