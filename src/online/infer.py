@@ -142,7 +142,7 @@ class InferenceEngine:
     # Internal helpers
     # ------------------------------------------------------------------
 
-    def _build_prompt(self, query: str, chunks: list[IndexMetadata]) -> str:
+    def _build_prompt(self, query: str, chunks: list[IndexMetadata]) -> list[dict]:
         context_blocks = []
         for i, c in enumerate(chunks, start=1):
             context_blocks.append(
@@ -150,29 +150,42 @@ class InferenceEngine:
                 f"effective={c.effective_date})\n{c.text}"
             )
         context = "\n\n".join(context_blocks)
-        return (
-            "You are Continual Counsel, a legal assistant specialising in "
-            "regulatory compliance. Answer the question using ONLY the provided "
-            "context. If the context does not contain sufficient information, "
-            "say so explicitly rather than guessing.\n\n"
-            f"Context:\n{context}\n\n"
-            f"Question: {query}\n\n"
-            "Answer:"
+        
+        system_msg = (
+            "You are Continual Counsel, a legal assistant specialising in regulatory compliance. "
+            "Answer the question using ONLY the provided context. If the context does not contain "
+            "sufficient information, say so explicitly rather than guessing.\n\n"
+            "CRITICAL FORMATTING INSTRUCTIONS:\n"
+            "1. Format your entire answer using clear, readable Markdown.\n"
+            "2. Use **bold text** to highlight key deadlines, percentages, or critical terms.\n"
+            "3. Use bullet points if you are listing multiple conditions or rules.\n"
+            "4. Always explicitly cite the Regulation (e.g., Regulation A) and Section in your text."
         )
+        user_msg = f"Context:\n{context}\n\nQuestion: {query}"
+        
+        return [
+            {"role": "system", "content": system_msg},
+            {"role": "user", "content": user_msg}
+        ]
 
-    def _generate(self, prompt: str) -> str:
+    def _generate(self, prompt) -> str:
         if self.model is None:
             return "[MOCK ANSWER] Based on the retrieved context, the notification deadline is 72 hours under Regulation A, or 48 hours for an AI incident under Regulation B."
 
         max_tokens = int(self._cfg.get("max_new_tokens", 512))
         temperature = float(self._cfg.get("temperature", 0.1))
-        output = self._llm(
-            prompt,
+        
+        if isinstance(prompt, str):
+            messages = [{"role": "user", "content": prompt}]
+        else:
+            messages = prompt
+
+        output = self._llm.create_chat_completion(
+            messages=messages,
             max_tokens=max_tokens,
             temperature=temperature,
-            echo=False,
         )
-        return output["choices"][0]["text"].strip()
+        return output["choices"][0]["message"]["content"].strip()
 
     def _llm_verifier(self, prompt: str) -> str:
         """Thin wrapper so verify_answer can call the LLM without knowing internals."""
@@ -245,11 +258,12 @@ class InferenceEngine:
         if vresult.flagged_claims:
             # Regenerate with a stricter prompt that explicitly lists the flagged claims.
             flagged_str = "\n".join(f"- {c}" for c in vresult.flagged_claims)
-            strict_prompt = (
-                f"{prompt}\n\n"
-                "WARNING: The following claims in a previous draft could not be "
+            import copy
+            strict_prompt = copy.deepcopy(prompt)
+            strict_prompt[-1]["content"] += (
+                "\n\nWARNING: The following claims in a previous draft could not be "
                 "verified against the context. Do NOT repeat them unless the "
-                f"context explicitly supports them:\n{flagged_str}\n\nAnswer:"
+                f"context explicitly supports them:\n{flagged_str}"
             )
             final_answer, was_regenerated = re_generate_if_flagged(
                 vresult,
