@@ -1,0 +1,11 @@
+Regulation D — Cross-Border Tariff Code (Effective Q4 2024)
+
+Section 1. Definitions.
+"Restricted Technology" refers to advanced semiconductors, cryptographic algorithms, and quantum processing units. "Cross-Border Transfer" refers to the physical or digital movement of goods across sovereign lines.
+
+Section 2. Tariff Directives.
+2.1 Any Cross-Border Transfer of Restricted Technology is subject to the immediate Tier 1 Tariff Rate of 22.5%.
+2.2 The reporting deadline for restricted tech export tariffs is strictly 24 hours from the moment the goods clear customs. Failure to report within 24 hours results in immediate revocation of the export license.
+
+Section 3. Contractual Liability.
+Multinational banks financing Cross-Border Transfers hold secondary liability if the primary exporter defaults on the Tier 1 Tariff.
