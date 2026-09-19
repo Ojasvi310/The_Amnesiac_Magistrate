@@ -424,7 +424,6 @@ def train_lora(
         weight_decay=loop_cfg.weight_decay,
         fp16=use_fp16,
         bf16=use_bf16,
-        logging_dir=str(run_dir / "logs"),
         logging_steps=10,
         save_strategy="no",
         report_to="none",
