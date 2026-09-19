@@ -20,8 +20,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 EXPORTS_DIR="$REPO_ROOT/exports"
 
-# Find the most recent bundle dir for this regime
-BUNDLE_DIR=$(ls -dt "$EXPORTS_DIR/${REGIME}_"* 2>/dev/null | head -1)
+# Find the most recent bundle dir for this regime (directories only, not .tar.gz files)
+BUNDLE_DIR=$(ls -dt "$EXPORTS_DIR/${REGIME}_"* 2>/dev/null | grep -v '\.tar\.gz' | head -1)
 if [[ -z "$BUNDLE_DIR" ]]; then
     echo "ERROR: No export bundle found under $EXPORTS_DIR for regime '$REGIME'."
     echo "       Run run_quarter_update_colab.sh first, or check that export.cadence is not 'merge_only'."
@@ -29,6 +29,8 @@ if [[ -z "$BUNDLE_DIR" ]]; then
 fi
 
 BUNDLE_NAME="$(basename "$BUNDLE_DIR")"
+# Strip any accidental .tar.gz suffix from the bundle name (defensive)
+BUNDLE_NAME="${BUNDLE_NAME%.tar.gz}"
 ARCHIVE="$EXPORTS_DIR/${BUNDLE_NAME}.tar.gz"
 
 # Stamp the commit hash into the manifest if export.py hasn't already
