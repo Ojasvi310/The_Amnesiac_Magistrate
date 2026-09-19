@@ -1,4 +1,4 @@
-Regulation D — Cross-Border Tariff Code (Effective Q4 2024)
+ï»¿Regulation D - Cross-Border Tariff Code (Effective Q4 2024)
 
 Section 1. Definitions.
 "Restricted Technology" refers to advanced semiconductors, cryptographic algorithms, and quantum processing units. "Cross-Border Transfer" refers to the physical or digital movement of goods across sovereign lines.
