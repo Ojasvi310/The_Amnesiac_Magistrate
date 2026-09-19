@@ -55,7 +55,7 @@ def merge_to_fp16(
     merged_model = merged_model.half()  # ensure fp16 throughout
 
     merged_model.save_pretrained(str(output_dir), safe_serialization=True)
-    tokenizer = AutoTokenizer.from_pretrained(str(adapter_dir), trust_remote_code=True)
+    tokenizer = AutoTokenizer.from_pretrained(base_model_id, trust_remote_code=True)
     tokenizer.save_pretrained(str(output_dir))
 
     log.info("Merged fp16 model saved to %s.", output_dir)
