@@ -172,8 +172,6 @@ Navigate to `http://localhost:8501`.
 The dashboard has five tabs:
 - **Query Assistant** — Chat with the compliance copilot
 - **Metrics** — Regime accuracies, BWT, FWT, hallucination rate
-- **Audit Queries** — Full audit log of every query with chunk-level traceability
-- **Lineage** — Adapter version lineage back to the training commit
 - **Confusion Set** — Cross-regime adversarial test scores
 
 ### 3. Generate Real Benchmark Scores (Optional)
@@ -185,15 +183,7 @@ python run_local_eval.py
 
 This fires the held-out benchmark questions at the running API, scores responses using keyword matching, and writes `report.json` files into `runs/` for the dashboard to display.
 
-### 4. Run Adversarial Cross-Regime Testing (Optional)
 
-```bash
-python run_adversarial_test.py
-```
-
-This fires deliberately deceptive "trap" questions (e.g., asking if Q4 tariff rules apply to Q3 offshore assets) and measures how often the model correctly refuses to mix up the two regimes.
-
----
 
 ## Key Design Decisions
 
@@ -203,8 +193,3 @@ The entire inference stack imports only `llama-cpp-python`, `faiss-cpu`, `senten
 **Confidence Gate raises, not warns**
 If the FAISS retrieval score for a query is below the threshold, `InsufficientGrounding` is raised and generation is blocked entirely. The API returns an escalation response. The model never hallucinates when it has nothing reliable to retrieve from.
 
-**Hash-chained audit log**
-Every query record includes the SHA-256 of the previous record. Tampering with any historical entry is detectable by `AuditLog.verify_chain()`. Every answer is traceable to the exact adapter version, FAISS index version, and retrieved source chunks that produced it.
-
-**BWT = 0.0 by construction**
-Backward Transfer is not approximately zero — it is exactly zero by the mathematical guarantee of orthogonal projection. New quarter gradients are projected into the null space of all prior quarter bases, making it geometrically impossible to modify prior knowledge.
