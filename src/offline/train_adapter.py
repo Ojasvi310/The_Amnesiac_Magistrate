@@ -151,7 +151,20 @@ def compose_training_batch(
                 "response": doc.get("text", ""),
             })
     else:
-        log.warning("No QA or docs JSON found in %s. Training on replay only.", regime_dir)
+        # Fallback to reading all .txt files in the directory
+        txt_files = list(regime_dir.glob("*.txt"))
+        if txt_files:
+            for txt_file in txt_files:
+                content = txt_file.read_text(encoding="utf-8")
+                # Split by double newlines to match FAISS chunks
+                chunks = [p.strip() for p in content.split("\n\n") if p.strip()]
+                for chunk in chunks:
+                    new_pairs.append({
+                        "prompt": f"Summarise the following {regime_name} compliance requirement:\n{chunk}",
+                        "response": chunk,
+                    })
+        else:
+            log.warning("No QA, docs JSON, or TXT files found in %s. Training on replay only.", regime_dir)
 
     if not new_pairs:
         log.warning("New regime data is empty for %s.", regime_name)
