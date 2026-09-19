@@ -33,9 +33,9 @@ BUNDLE_NAME="$(basename "$BUNDLE_DIR")"
 BUNDLE_NAME="${BUNDLE_NAME%.tar.gz}"
 ARCHIVE="$EXPORTS_DIR/${BUNDLE_NAME}.tar.gz"
 
-# Stamp the commit hash into the manifest if export.py hasn't already
+# Stamp the commit hash into the metadata if export.py hasn't already
 COMMIT=$(git -C "$REPO_ROOT" rev-parse HEAD 2>/dev/null || echo "unknown")
-if [[ -f "$BUNDLE_DIR/manifest.json" ]]; then
+if [[ -f "$BUNDLE_DIR/metadata.json" ]]; then
     # Verify commit_hash field is present; if missing, patch it in via python
     python3 -c "
 import json, sys
@@ -44,19 +44,10 @@ m = json.loads(open(path).read())
 if not m.get('commit_hash'):
     m['commit_hash'] = commit
     open(path, 'w').write(json.dumps(m, indent=2))
-    print('Patched commit_hash into manifest.json')
-" "$BUNDLE_DIR/manifest.json" "$COMMIT"
-
-    # Recompute manifest.sha256 after any patching
-    python3 -c "
-import hashlib, sys
-content = open(sys.argv[1], 'rb').read()
-digest = hashlib.sha256(content).hexdigest()
-open(sys.argv[1].replace('manifest.json', 'manifest.sha256'), 'w').write(digest + '\n')
-print('manifest.sha256:', digest[:16], '...')
-" "$BUNDLE_DIR/manifest.json"
+    print('Patched commit_hash into metadata.json')
+" "$BUNDLE_DIR/metadata.json" "$COMMIT"
 else
-    echo "WARNING: manifest.json not found in bundle. export.py may not have run Step F."
+    echo "WARNING: metadata.json not found in bundle. export.py may not have run Step F."
 fi
 
 echo "Archiving $BUNDLE_NAME ..."

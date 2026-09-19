@@ -127,8 +127,6 @@ class InferenceEngine:
         else:
             self.model = Llama(
                 model_path=str(gguf_p),
-                lora_base=str(gguf_p),
-                lora_path=str(adapter_dir),
                 n_ctx=2048,
                 n_threads=4,
                 verbose=False,

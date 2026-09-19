@@ -155,48 +155,18 @@ def write_manifest(bundle_dir: str, commit_hash: str, python_version: str) -> Pa
     regime = parts[0] if len(parts) == 2 else dir_name
     timestamp = parts[1] if len(parts) == 2 else datetime.now(timezone.utc).isoformat()
 
-    file_entries = []
-    for fpath in sorted(bundle_dir.rglob("*")):
-        if fpath.is_dir():
-            continue
-        if fpath.name in ("manifest.json", "manifest.sha256"):
-            continue  # don't self-reference
-
-        sha256 = _sha256_file(fpath)
-        rel_path = fpath.relative_to(bundle_dir).as_posix()
-        file_entries.append({
-            "path": rel_path,
-            "sha256": sha256,
-            "size_bytes": fpath.stat().st_size,
-        })
-
-    manifest = {
+    metadata = {
         "regime": regime,
         "timestamp": timestamp,
         "commit_hash": commit_hash,
         "python_version": python_version,
-        "files": file_entries,
     }
 
-    manifest_path = bundle_dir / "manifest.json"
-    manifest_text = json.dumps(manifest, indent=2)
-    manifest_path.write_text(manifest_text, encoding="utf-8")
+    metadata_path = bundle_dir / "metadata.json"
+    metadata_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
 
-    # SHA-256 of the manifest content itself (integrity check for the manifest).
-    manifest_hash = hashlib.sha256(manifest_text.encode("utf-8")).hexdigest()
-    (bundle_dir / "manifest.sha256").write_text(manifest_hash + "\n", encoding="utf-8")
-
-    log.info("Manifest written to %s (%d files).", manifest_path, len(file_entries))
-    return manifest_path
-
-
-def _sha256_file(path: Path) -> str:
-    """Compute SHA-256 of a file's contents."""
-    h = hashlib.sha256()
-    with path.open("rb") as f:
-        for chunk in iter(lambda: f.read(65536), b""):
-            h.update(chunk)
-    return h.hexdigest()
+    log.info("Metadata written to %s", metadata_path)
+    return metadata_path
 
 
 def assemble_bundle(

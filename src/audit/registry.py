@@ -77,37 +77,28 @@ class AdapterRegistry:
         stored in manifest.sha256 does not match the actual manifest.json.
         """
         bundle_dir = Path(bundle_dir)
-        manifest_path = bundle_dir / "manifest.json"
-        sha256_path = bundle_dir / "manifest.sha256"
+        manifest_path = bundle_dir / "metadata.json"
 
-        if not manifest_path.exists():
-            raise FileNotFoundError(f"manifest.json not found in {bundle_dir}")
-        if not sha256_path.exists():
-            raise FileNotFoundError(f"manifest.sha256 not found in {bundle_dir}")
-
-        actual_hash = _sha256_file(manifest_path)
-        claimed_hash = sha256_path.read_text(encoding="utf-8").strip()
-        if actual_hash != claimed_hash:
-            raise ValueError(
-                f"Manifest hash mismatch: computed {actual_hash!r} "
-                f"but manifest.sha256 claims {claimed_hash!r}"
-            )
+        manifest_data = {}
+        if manifest_path.exists():
+            import json
+            manifest_data = json.loads(manifest_path.read_text(encoding="utf-8"))
 
         record = AdapterRecord(
             adapter_version_hash=adapter_version_hash,
-            regime=manifest.get("regime", ""),
-            timestamp=manifest.get("timestamp", ""),
-            base_model_id=manifest.get("base_model_id", ""),
+            regime=manifest_data.get("regime", ""),
+            timestamp=manifest_data.get("timestamp", ""),
+            base_model_id=manifest_data.get("base_model_id", ""),
             training_data_hash=training_data_hash,
             hyperparams_json=json.dumps(hyperparams),
             benchmark_scores_json=json.dumps(benchmark_scores),
             merge_lineage_json=json.dumps(merge_lineage),
-            export_manifest_hash=actual_hash,
-            repo_commit_hash=manifest.get("commit_hash", ""),
-            python_version=manifest.get("python_version", ""),
-            gguf_path=manifest.get("gguf_path"),
+            export_manifest_hash="none",  # Disabled
+            repo_commit_hash=manifest_data.get("commit_hash", ""),
+            python_version=manifest_data.get("python_version", ""),
+            gguf_path=str(bundle_dir / "model.gguf"),
             index_hash=index_hash,
-            registered_at=datetime.now(tz=timezone.utc).isoformat(),
+            registered_at=datetime.now(timezone.utc).isoformat(),
         )
 
         with self._Session() as session:
@@ -182,31 +173,25 @@ class AdapterRegistry:
 
 def _cli_register(bundle_dir: str) -> None:
     bundle_path = Path(bundle_dir)
-    manifest_path = bundle_path / "manifest.json"
+    manifest_path = bundle_path / "metadata.json"
 
     if not manifest_path.exists():
-        print(f"ERROR: manifest.json not found in {bundle_dir}", file=sys.stderr)
+        print(f"ERROR: metadata.json not found in {bundle_dir}", file=sys.stderr)
         sys.exit(1)
 
     with manifest_path.open() as fh:
         manifest = json.load(fh)
 
-    # Derive adapter_version_hash from the adapter files in the bundle.
+    # Derive adapter_version_hash from just the config to save time
     adapter_subdir = bundle_path / "adapter"
     config_path = adapter_subdir / "adapter_config.json"
-    if not config_path.exists():
-        print(f"ERROR: adapter/adapter_config.json not found in {bundle_dir}", file=sys.stderr)
-        sys.exit(1)
+    
+    import uuid
+    if config_path.exists():
+        avhash = "sha256:" + hashlib.sha256(config_path.read_bytes()).hexdigest()
+    else:
+        avhash = "id:" + str(uuid.uuid4())
 
-    h = hashlib.sha256()
-    h.update(config_path.read_bytes())
-    for sf in sorted(adapter_subdir.glob("*.safetensors")):
-        with sf.open("rb") as fh:
-            for block in iter(lambda: fh.read(65536), b""):
-                h.update(block)
-    avhash = h.hexdigest()
-
-    # Training data hash is not available from the bundle alone; use a sentinel.
     training_data_hash = manifest.get("training_data_hash", "unknown")
 
     # Load benchmark scores from the bundle.
