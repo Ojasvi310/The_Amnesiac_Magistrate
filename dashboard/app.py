@@ -96,25 +96,28 @@ with tab_metrics:
     else:
         df = reports_to_dataframe(reports)
         if df is not None and not df.empty:
-            st.subheader("Accuracy over Time")
+            latest = df.iloc[-1]
+            st.subheader("Current Performance")
             acc_cols = [c for c in df.columns if c.startswith("acc_")]
             if acc_cols:
-                chart_data = df.set_index("timestamp")[acc_cols]
-                st.line_chart(chart_data)
+                st.markdown("### Regime Accuracies")
+                cols = st.columns(len(acc_cols))
+                for i, col_name in enumerate(acc_cols):
+                    regime_name = col_name.replace("acc_", "").upper()
+                    val = latest.get(col_name, 0.0)
+                    cols[i].metric(label=regime_name, value=f"{val * 100:.1f}%")
                 
-            col1, col2 = st.columns(2)
+            st.markdown("---")
+            st.markdown("### Learning Metrics")
+            col1, col2, col3, col4 = st.columns(4)
             with col1:
-                st.subheader("BWT & FWT")
-                st.line_chart(df.set_index("timestamp")[["bwt", "fwt"]])
+                col1.metric(label="Backward Transfer (BWT)", value=f"{latest.get('bwt', 0.0) * 100:.2f}%")
             with col2:
-                st.subheader("Adapter Footprint (MB)")
-                st.line_chart(df.set_index("timestamp")[["footprint_mb"]])
-                
-            st.subheader("Basis Rank (Sawtooth)")
-            st.line_chart(df.set_index("timestamp")[["basis_rank"]])
-            
-            st.subheader("Hallucination Rate")
-            st.line_chart(df.set_index("timestamp")[["hallucination_rate"]])
+                col2.metric(label="Forward Transfer (FWT)", value=f"{latest.get('fwt', 0.0) * 100:.2f}%")
+            with col3:
+                col3.metric(label="Adapter Footprint", value=f"{latest.get('footprint_mb', 0.0):.1f} MB")
+            with col4:
+                col4.metric(label="Hallucination Rate", value=f"{latest.get('hallucination_rate', 0.0) * 100:.2f}%")
 
 
 with tab_queries:
@@ -170,5 +173,7 @@ with tab_confusion:
     if reports:
         df = reports_to_dataframe(reports)
         if df is not None and not df.empty and "confusion_score" in df.columns:
-            st.line_chart(df.set_index("timestamp")[["confusion_score"]])
+            latest = df.iloc[-1]
+            val = latest.get("confusion_score", 0.0)
+            st.metric(label="Current Cross-Regime Confusion Score", value=f"{val * 100:.2f}%")
     st.write("In-depth cross-regime adversarial test performance helps verify that models distinguish regimes with overlapping terminology.")
